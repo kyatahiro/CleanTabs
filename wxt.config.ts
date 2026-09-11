@@ -6,6 +6,13 @@ export default defineConfig({
   extensionApi: "chrome",
   modules: ["@wxt-dev/module-react"],
   manifest: {
+    browser_specific_settings: {
+      gecko: {
+        data_collection_permissions: {
+          required: ["none"],
+        },
+      },
+    },
     permissions: ["storage", "tabs", "alarms", "tabGroups"],
     content_security_policy: {
       extension_pages:
