@@ -26,13 +26,22 @@ CleanTabs  auto discards (sleep) / closes tabs in the background, **based on cus
 
 At every minute, **CleanTabs** will iterate over all tabs of all windows:
 
-If 
-- not `Disabeld`
+If a rule is enabled and
 - `tab.url` matches `<URL Pattern>`
+- inactive duration exceeds `<Inactive minutes>`
 
 **CleanTabs** will
-- perform `<Action>` on this tab if leaving duration exceeds `<Inactive minutes>`
+- perform `<Action>` on this tab
 - process the next tab
+
+Rules are evaluated from top to bottom. The first enabled rule whose URL pattern and inactive duration both match is applied. This allows staged actions, for example:
+
+```
+*, 60, close
+*, 15, discard
+```
+
+With these rules, a tab is discarded after 15 minutes and closed after 60 minutes.
 
 > [!NOTE]
 > These tabs will not be discarded or closed:

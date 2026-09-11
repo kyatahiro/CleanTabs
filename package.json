@@ -38,7 +38,7 @@
     "@uiw/react-codemirror": "^4.23.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "codemirror-lang-ct": "github:heyppen/codemirror-lang-ct",
+    "@cookshack/codemirror-lang-csv": "0.1.0",
     "lucide-react": "^0.456.0",
     "react": "^18.3.1",
     "react-archer": "^4.4.0",

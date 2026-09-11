@@ -411,8 +411,9 @@ function TabItem({
   // }, [bounds])
 
   const matchedRule: Rule | null = useMemo(() => {
-    if (tab.url) {
-      return FindMatchedRule(rules, tab.url)
+    if (tab.url && tab.lastAccessed) {
+      const inactiveMinutes = (Date.now() - tab.lastAccessed) / 1000 / 60
+      return FindMatchedRule(rules, tab.url, inactiveMinutes)
     }
     return null
   }, [rules, tab])
