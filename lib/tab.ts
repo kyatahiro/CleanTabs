@@ -18,3 +18,10 @@ export interface Flag {
 }
 
 export const DefaultFlags: Flag[] = [];
+
+/**
+ * Returns whether a tab is currently producing audio according to the browser.
+ */
+export function IsTabAudible(tab: { audible?: boolean }): boolean {
+  return tab.audible === true
+}

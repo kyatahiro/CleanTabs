@@ -8,6 +8,7 @@ import { FindMatchedRule, Rule } from '@/lib/rule';
 import { AddToStash, GetSettings, GetRules, STORAGE_KEY_ENABLED, GetFlags, SetFlags, InitStorage } from '@/lib/storage';
 import { StashItem } from '@/lib/stash';
 import { NowHuman } from '@/lib/date';
+import { IsTabAudible } from '@/lib/tab';
 
 export default defineBackground(() => {
   console.log('background.js starts...', { id: browser.runtime.id });
@@ -77,6 +78,11 @@ export default defineBackground(() => {
 
       if (tab.active) {
         console.log('tab is active, skip...')
+        continue
+      }
+
+      if (IsTabAudible(tab)) {
+        console.log('tab is audible, skip...')
         continue
       }
 

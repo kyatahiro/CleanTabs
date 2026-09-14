@@ -46,6 +46,7 @@ With these rules, a tab is discarded after 15 minutes and closed after 60 minute
 > [!NOTE]
 > These tabs will not be discarded or closed:
 > - focused tab in every window
+> - tabs currently producing audio
 > - pinned or grouped tabs if disabled in settings
 > - tabs excluded manually
 
