@@ -43,7 +43,7 @@ export const Actions: Record<Action, ActionAttr> = {
   },
 }
 
-export function FindMatchedRule(rules: Rule[], url: string): Rule | null {
+export function FindMatchedRule(rules: Rule[], url: string, inactiveMinutes: number): Rule | null {
   for (let i = 0; i < rules.length; i++) {
     const rule = rules[i];
 
@@ -52,7 +52,7 @@ export function FindMatchedRule(rules: Rule[], url: string): Rule | null {
     }
 
     const p = new MatchPattern(rule.url_pattern)
-    if (p.includes(url)) {
+    if (p.includes(url) && inactiveMinutes > rule.inactive_minutes) {
       return { ...rule, index: i }
     }
   }

@@ -6,11 +6,14 @@ export default defineConfig({
   extensionApi: "chrome",
   modules: ["@wxt-dev/module-react"],
   manifest: {
-    permissions: ["storage", "tabs", "alarms", "tabGroups"],
-    content_security_policy: {
-      extension_pages:
-        "script-src 'self' 'wasm-unsafe-eval' http://localhost:3000; object-src 'self';",
+    browser_specific_settings: {
+      gecko: {
+        data_collection_permissions: {
+          required: ["none"],
+        },
+      },
     },
+    permissions: ["storage", "tabs", "alarms", "tabGroups"],
     web_accessible_resources: [
       {
         resources: ["lib/*"],

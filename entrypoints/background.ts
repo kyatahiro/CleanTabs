@@ -4,8 +4,7 @@ import { storage } from 'wxt/storage';
 import { defineBackground } from 'wxt/sandbox';
 import { sendMessage, onMessage } from 'webext-bridge/background'
 
-import { MatchPattern } from '@/lib/match-pattern';
-import { Rule } from '@/lib/rule';
+import { FindMatchedRule, Rule } from '@/lib/rule';
 import { AddToStash, GetSettings, GetRules, STORAGE_KEY_ENABLED, GetFlags, SetFlags, InitStorage } from '@/lib/storage';
 import { StashItem } from '@/lib/stash';
 import { NowHuman } from '@/lib/date';
@@ -66,8 +65,6 @@ export default defineBackground(() => {
     const rules = await GetRules();
     console.log('rules:', rules)
 
-    const patterns = rulesToPatterns(rules)
-
     const tabs = await browser.tabs.query({})
     for (const tab of tabs) {
       if (!(tab.id) || !(tab.url)) {
@@ -89,15 +86,21 @@ export default defineBackground(() => {
         continue
       }
 
-      const p = findPattern(patterns, url)
-      if (!p) {
+      if (!tab.lastAccessed) {
+        console.log('tab.lastAccessed undefined')
+        continue
+      }
+
+      const inactiveMinutes = (Date.now() - tab.lastAccessed) / 1000 / 60
+      const rule = FindMatchedRule(rules, url, inactiveMinutes)
+      if (!rule) {
         console.log('no matching rule')
         continue
       }
-      console.log('matching rule:', p)
+      console.log('matching rule:', rule)
 
       // execute matching rule
-      await executeRule(p.rule, tab)
+      await executeRule(rule, tab)
     }
 
     sendMessage('cron:done', {}, 'popup')
@@ -123,36 +126,7 @@ export default defineBackground(() => {
     await SetFlags(aliveFlags)
   }
 
-  interface Pattern {
-    index: number;
-    rule: Rule;
-    pattern: MatchPattern;
-  }
-
-  function rulesToPatterns(rules: Rule[]): Pattern[] {
-    const patterns: Pattern[] = [];
-    for (let i = 0; i < rules.length; i++) {
-      const r = rules[i];
-      patterns.push({
-        index: i,
-        rule: r,
-        pattern: new MatchPattern(r.url_pattern),
-      })
-    }
-    return patterns;
-  }
-
   async function executeRule(rule: Rule, tab: Tabs.Tab) {
-    if (!tab.lastAccessed) {
-      console.log('tab.lastAccessed undefined')
-      return
-    }
-    const inactive_minutes = (new Date().getTime() - tab.lastAccessed) / 1000 / 60;
-    if (inactive_minutes <= rule.inactive_minutes) {
-      console.log(`inactive_minutes: ${inactive_minutes} <= ${rule.inactive_minutes}(rule), skip...`)
-      return
-    }
-
     if (rule.action === 'discard') {
       discardTab(tab)
     } else if (rule.action === 'close') {
@@ -193,20 +167,6 @@ export default defineBackground(() => {
       browser.tabs.remove(tab.id)
     }
   }
-
-
-  function findPattern(patterns: Pattern[], url: string): Pattern | null {
-    for (const p of patterns) {
-      if (p.rule.disabled) {
-        continue
-      }
-      if (p.pattern.includes(url)) {
-        return p
-      }
-    }
-    return null
-  }
-
 
   async function enabled(): Promise<boolean> {
     const b = await storage.getItem(STORAGE_KEY_ENABLED)

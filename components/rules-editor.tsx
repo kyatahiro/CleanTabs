@@ -1,5 +1,5 @@
 import { EditorView, useCodeMirror, Compartment } from "@uiw/react-codemirror"
-import { csv } from "codemirror-lang-ct"
+import { csv } from "@cookshack/codemirror-lang-csv"
 import { githubLight, githubDark } from "@uiw/codemirror-theme-github"
 
 import {
